@@ -3,3 +3,6 @@ http://www.androiddesignpatterns.com/2014/12/activity-fragment-transitions-in-an
 
 fragment transition between fragments, example:
 http://stackoverflow.com/questions/4932462/animate-the-transition-between-fragments
+
+material library
+https://github.com/navasmdc/MaterialDesignLibrary#flat-button
