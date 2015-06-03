@@ -2,22 +2,24 @@ package ch.eia_fr.tic.magnemazzoleni.tripplanner.sql;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.io.Serializable;
+
 /**
  * Created by Dosky on 29.05.2015.
  */
-public class Trip {
-    long id;
+public class Trip implements Serializable {
+    private long id;
 
-    LatLng departure;
-    LatLng arrival;
+    private LatLng departure;
+    private LatLng arrival;
 
-    double distance;
+    private double distance;
 
-    String name;
-    int color;
+    private String name;
+    private int color;
 
-    String departureAddress;
-    String arrivalAddress;
+    private String departureAddress;
+    private String arrivalAddress;
 
     public Trip(long id, LatLng departure, LatLng arrival, double distance, String name, int color, String departureAddress, String arrivalAddress) {
         this.id = id;

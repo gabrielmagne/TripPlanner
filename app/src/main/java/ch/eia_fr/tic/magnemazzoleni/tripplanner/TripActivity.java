@@ -7,9 +7,10 @@ import android.util.Log;
 
 import ch.eia_fr.tic.magnemazzoleni.tripplanner.sql.Trip;
 
-public class TripActivity extends FragmentActivity implements TripFragment.OnFragmentInteractionListener {
-
-    //private GoogleMap mMap; // Might be null if Google Play services APK is not available.
+public class TripActivity extends FragmentActivity
+        implements TripFragment.OnFragmentInteractionListener,
+                     TripAdd.OnFragmentInteractionListener,
+                     TripInfo.OnFragmentInteractionListener {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +27,17 @@ public class TripActivity extends FragmentActivity implements TripFragment.OnFra
 
     @Override
     public void onTripSelectedItem(Trip trip) {
-        Log.i("Evt", trip.getId() + "");
+        Log.i("Evt Select", trip.getId() + "");
+    }
+
+    @Override
+    public void onAddTrip(Trip trip) {
+        Log.i("Evt Add", trip.getId() + "");
+    }
+
+    @Override
+    public void onInfoOpenMap(Trip trip) {
+        Log.i("Evt Info", trip.getId() + "");
     }
 
     /**
