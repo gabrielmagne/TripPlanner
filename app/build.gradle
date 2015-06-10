@@ -26,4 +26,5 @@ dependencies {
     compile 'com.android.support:support-v4:22.1.1'
     compile 'com.nineoldandroids:library:2.4.0'
     compile 'com.github.navasmdc:MaterialDesign:1.5@aar'
+    compile 'com.loopj.android:android-async-http:1.4.5'
 }

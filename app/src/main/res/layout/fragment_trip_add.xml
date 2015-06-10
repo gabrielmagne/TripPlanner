@@ -3,13 +3,13 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="ch.eia_fr.tic.magnemazzoleni.tripplanner.TripAdd"
+    tools:context="ch.eia_fr.tic.magnemazzoleni.tripplanner.TripActivity"
     android:id="@+id/fragment_trip_add">
 
-
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-        android:layout_height="match_parent" android:id="@+id/map" tools:context=".TripActivity"
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/map_add"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_alignParentLeft="true"
         android:layout_marginLeft="0dp"
@@ -17,35 +17,45 @@
         android:layout_marginTop="0dp">
     </fragment>
 
-    <EditText
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editText"
+        android:background="@android:drawable/picture_frame"
+        android:layout_marginTop="24dp"
+        android:layout_marginLeft="24dp"
+        android:layout_marginRight="24dp"
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:layout_marginLeft="24dp"
-        android:layout_marginStart="23dp"
-        android:layout_marginTop="24dp"
-        android:layout_marginRight="24dp"
-        android:editable="false"
-        android:background="#ffffff"
-        android:padding="5dp"
-        android:hint="From" />
+        android:id="@+id/linearLayout">
 
-    <EditText
+        <AutoCompleteTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/add_from"
+            android:padding="4dp"
+            android:hint="From"
+            android:singleLine="true" />
+    </LinearLayout>
+
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editText2"
-        android:layout_marginTop="24dp"
-        android:editable="false"
-        android:background="#ffffff"
-        android:padding="5dp"
-        android:layout_below="@+id/editText"
-        android:layout_alignLeft="@+id/editText"
-        android:layout_alignStart="@+id/editText"
+        android:background="@android:drawable/picture_frame"
+        android:layout_below="@+id/linearLayout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="24dp"
         android:layout_marginRight="24dp"
-        android:hint="To" />
+        android:layout_marginBottom="24dp">
+
+        <AutoCompleteTextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/add_to"
+            android:padding="4dp"
+            android:hint="To"
+            android:singleLine="true" />
+    </LinearLayout>
 
     <com.gc.materialdesign.views.ButtonFloat
         android:id="@+id/add_save"
@@ -56,7 +66,7 @@
         android:layout_marginRight="24dp"
         android:layout_marginBottom="24dp"
         android:background="#ffe52d24"
-        materialdesign:animate="true"
+        materialdesign:animate="false"
         materialdesign:iconDrawable="@mipmap/ic_action_new"/>
 
 </RelativeLayout>

@@ -1,16 +1,24 @@
 package ch.eia_fr.tic.magnemazzoleni.tripplanner;
 
+import android.animation.Animator;
 import android.app.Activity;
+import android.graphics.Point;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
+
+import com.gc.materialdesign.views.ButtonFloat;
 
 import java.util.List;
 
@@ -32,6 +40,8 @@ public class TripFragment extends Fragment implements AbsListView.OnItemClickLis
     private List<Trip> tripList;
 
     private OnFragmentInteractionListener mListener;
+
+    private ButtonFloat btnAdd;
 
     /**
      * The fragment's ListView/GridView.
@@ -81,6 +91,17 @@ public class TripFragment extends Fragment implements AbsListView.OnItemClickLis
         // Set OnItemClickListener so we can be notified on item clicks
         mListView.setOnItemClickListener(this);
 
+        // floating button
+        btnAdd = (ButtonFloat) view.findViewById(R.id.list_add_trip);
+
+        // tell activity to switch fragment
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mListener.showAddFragment();
+            }
+        });
+
         return view;
     }
 
@@ -123,6 +144,11 @@ public class TripFragment extends Fragment implements AbsListView.OnItemClickLis
         }
     }
 
+    public void signal(Trip trip) {
+        tripList.add(0, trip);
+        ((BaseAdapter) mAdapter).notifyDataSetChanged();
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -135,6 +161,7 @@ public class TripFragment extends Fragment implements AbsListView.OnItemClickLis
      */
     public interface OnFragmentInteractionListener {
         public void onTripSelectedItem(Trip id);
+        public void showAddFragment();
     }
 
 }
