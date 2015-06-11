@@ -1,15 +1,10 @@
 package ch.eia_fr.tic.magnemazzoleni.tripplanner;
 
-import android.animation.Animator;
 import android.app.Activity;
-import android.graphics.Point;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
@@ -127,7 +122,7 @@ public class TripFragment extends Fragment implements AbsListView.OnItemClickLis
         if (null != mListener) {
             // Notify the active callbacks interface (the activity, if the
             // fragment is attached to one) that an item has been selected.
-            mListener.onTripSelectedItem(tripList.get(position));
+            mListener.openTripInfo(tripList.get(position));
         }
     }
 
@@ -160,7 +155,7 @@ public class TripFragment extends Fragment implements AbsListView.OnItemClickLis
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        public void onTripSelectedItem(Trip id);
+        public void openTripInfo(Trip trip);
         public void showAddFragment();
     }
 

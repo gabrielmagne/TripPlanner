@@ -6,7 +6,9 @@
     tools:context="ch.eia_fr.tic.magnemazzoleni.tripplanner.TripInfo"
     android:orientation="vertical"
     android:padding="24dp"
-    android:id="@+id/fragment_trip_info">
+    android:id="@+id/fragment_trip_info"
+    android:background="@android:color/background_light"
+    android:clickable="true">
 
     <TextView
         android:layout_width="fill_parent"
@@ -46,8 +48,7 @@
                 android:layout_height="wrap_content"
                 android:textAppearance="?android:attr/textAppearanceSmall"
                 android:text="#address"
-                android:id="@+id/info_departure"
-                android:layout_weight="1" />
+                android:id="@+id/info_departure" />
         </LinearLayout>
 
         <LinearLayout
@@ -159,7 +160,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:weightSum="2"
-            android:layout_marginBottom="6dp">
+            android:layout_marginBottom="12dp">
 
             <TextView
                 android:layout_width="fill_parent"
@@ -169,13 +170,17 @@
                 android:layout_weight="1"
                 android:gravity="center_vertical" />
 
-            <com.gc.materialdesign.views.Switch
-                android:id="@+id/switchView"
+            <LinearLayout
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:background="#1E88E5"
-                android:layout_weight="1"
-                materialdesign:check="true" />
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <com.rey.material.widget.Switch
+                    style="@style/Material.Widget.Switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:checked="false"/>
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -184,7 +189,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:weightSum="2"
-            android:layout_marginBottom="6dp">
+            android:layout_marginBottom="12dp">
 
             <TextView
                 android:layout_width="fill_parent"
@@ -194,13 +199,17 @@
                 android:layout_weight="1"
                 android:gravity="center_vertical"/>
 
-            <com.gc.materialdesign.views.Switch
-                android:id="@+id/switchView2"
+            <LinearLayout
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:background="#1E88E5"
-                android:layout_weight="1"
-                materialdesign:check="true" />
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <com.rey.material.widget.Switch
+                    style="@style/Material.Widget.Switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:checked="false"/>
+            </LinearLayout>
 
         </LinearLayout>
 
@@ -209,7 +218,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:weightSum="2"
-            android:layout_marginBottom="6dp">
+            android:layout_marginBottom="12dp">
 
             <TextView
                 android:layout_width="fill_parent"
@@ -219,13 +228,17 @@
                 android:layout_weight="1"
                 android:gravity="center_vertical" />
 
-            <com.gc.materialdesign.views.Switch
-                android:id="@+id/switchView3"
+            <LinearLayout
                 android:layout_width="fill_parent"
-                android:layout_height="wrap_content"
-                android:background="#1E88E5"
-                android:layout_weight="1"
-                materialdesign:check="true" />
+                android:layout_height="fill_parent"
+                android:layout_weight="1">
+                <com.rey.material.widget.Switch
+                    style="@style/Material.Widget.Switch"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:checked="false"/>
+            </LinearLayout>
 
         </LinearLayout>
 

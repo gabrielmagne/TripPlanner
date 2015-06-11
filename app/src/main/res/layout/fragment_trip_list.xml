@@ -4,7 +4,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="ch.eia_fr.tic.magnemazzoleni.tripplanner.TripFragment"
-    android:id="@+id/fragment_trip_list">
+    android:id="@+id/fragment_trip_list"
+    android:background="@android:color/background_light">
 
     <ListView android:id="@android:id/list" android:layout_width="match_parent"
         android:layout_height="match_parent"

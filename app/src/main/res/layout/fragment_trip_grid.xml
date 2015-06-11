@@ -4,7 +4,9 @@
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="ch.eia_fr.tic.magnemazzoleni.tripplanner.TripFragment"
-    android:id="@+id/fragment_trip_list">
+    android:id="@+id/fragment_trip_list"
+    android:background="@android:color/background_light"
+    android:clickable="true">
 
     <GridView android:id="@+id/list_trips" android:layout_width="match_parent"
         android:layout_height="match_parent" android:numColumns="2"

@@ -4,7 +4,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="ch.eia_fr.tic.magnemazzoleni.tripplanner.TripActivity"
-    android:id="@+id/fragment_trip_add">
+    android:id="@+id/fragment_trip_add"
+    android:background="@android:color/background_light"
+    android:clickable="true">
 
     <fragment
         android:layout_width="match_parent"
@@ -33,6 +35,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/add_from"
+            android:background="#ffffff"
             android:padding="4dp"
             android:hint="From"
             android:singleLine="true" />
@@ -52,6 +55,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/add_to"
+            android:background="#ffffff"
             android:padding="4dp"
             android:hint="To"
             android:singleLine="true" />

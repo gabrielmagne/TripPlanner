@@ -9,6 +9,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.transition.Fade;
+import android.transition.TransitionManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -153,12 +155,21 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
             getActivity().getWindowManager().getDefaultDisplay().getSize(size);
             int cx = size.x / 2;
             int cy = size.y / 2;
-            int finalRadius = Math.max(size.x, size.y) / 2;
+            int finalRadius = (int) (Math.max(size.x, size.y) / 1.6d);
             Animator anim = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
 
             // make the view visible and start the animation
             view.setVisibility(View.VISIBLE);
             anim.start();
+        }
+
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            TransitionManager.beginDelayedTransition((ViewGroup) getView().getRootView(), new Fade());
         }
     }
 
@@ -220,9 +231,10 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
         Trip trip =  sql.insert(
             latLngDep,
             latLngArr,
-            distance / 1000d,
+            distance,
+            duration,
             "" + Math.random(),
-            generateRandomColor(),
+            Utils.generateRandomColor(),
             departure,
             arrival
         );
@@ -241,24 +253,6 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
-    }
-
-    /**
-     * Generate a random color
-     * @return
-     */
-    private int generateRandomColor() {
-        Random random = new Random();
-        int red = random.nextInt(256);
-        int green = random.nextInt(256);
-        int blue = random.nextInt(256);
-
-        // mix the color
-        red = (red + 255)     / 2;
-        green = (green + 255) / 2;
-        blue = (blue + 255)   / 2;
-
-        return red << 8 | green << 4 | blue;
     }
 
     @Override

@@ -20,10 +20,11 @@ public class TripSQLHelper extends SQLiteOpenHelper {
     public static final String COL_ARR_LAT      = "arr_lat";
     public static final String COL_ARR_LNG      = "arr_lng";
     public static final String COL_DISTANCE     = "distance";
+    public static final String COL_DURATION     = "duration";
     public static final String COL_COLOR        = "color";
 
     public static final String DB_NAME = TABLE_NAME + ".sqlite";
-    public static final int   DB_VERSION = 2;
+    public static final int   DB_VERSION = 1;
     public static final String DB_CREATE = String.format(
         "create table %s ( " +
             "%s integer primary key autoincrement, " +
@@ -34,7 +35,8 @@ public class TripSQLHelper extends SQLiteOpenHelper {
             "%s real not null, " +
             "%s real not null, " +
             "%s real not null, " +
-            "%s real not null, " +
+            "%s integer not null, " +
+            "%s integer not null," +
             "%s integer not null" +
         " );",
             TABLE_NAME,
@@ -47,6 +49,7 @@ public class TripSQLHelper extends SQLiteOpenHelper {
             COL_ARR_LAT,
             COL_ARR_LNG,
             COL_DISTANCE,
+            COL_DURATION,
             COL_COLOR
     );
 
@@ -60,6 +63,7 @@ public class TripSQLHelper extends SQLiteOpenHelper {
             COL_ARR_LAT,
             COL_ARR_LNG,
             COL_DISTANCE,
+            COL_DURATION,
             COL_COLOR
     };
 

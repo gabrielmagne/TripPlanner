@@ -1,11 +1,21 @@
 package ch.eia_fr.tic.magnemazzoleni.tripplanner;
 
+import android.animation.Animator;
 import android.app.Activity;
+import android.graphics.Point;
+import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.transition.Fade;
+import android.transition.TransitionManager;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import ch.eia_fr.tic.magnemazzoleni.tripplanner.sql.Trip;
 
@@ -21,8 +31,13 @@ public class TripInfo extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_TRIP = "trip";
 
-    // TODO: Rename and change types of parameters
     private Trip trip;
+
+    private TextView tripname;
+    private TextView departure;
+    private TextView arrival;
+    private TextView km;
+    private TextView duration;
 
     private OnFragmentInteractionListener mListener;
 
@@ -42,7 +57,6 @@ public class TripInfo extends Fragment {
     }
 
     public TripInfo() {
-        // Required empty public constructor
     }
 
     @Override
@@ -56,14 +70,74 @@ public class TripInfo extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_trip_info, container, false);
+
+        // background
+        LinearLayout layout = (LinearLayout) view.findViewById(R.id.fragment_trip_info);
+        layout.setBackground(new ColorDrawable(Utils.lighterColor(trip.getColor()) | 0xff000000));
+
+        // elements
+        tripname = (TextView) view.findViewById(R.id.info_tripname);
+        departure = (TextView) view.findViewById(R.id.info_departure);
+        arrival = (TextView) view.findViewById(R.id.info_arrival);
+        km = (TextView) view.findViewById(R.id.info_km);
+        duration = (TextView) view.findViewById(R.id.info_time);
+
+        // fill with trip
+        tripname.setText(trip.getName());
+        departure.setText(trip.getDepartureAddress());
+        arrival.setText(trip.getArrivalAddress());
+        if(trip.getDistance() > 1000)
+            km.setText(String.format("%.2f km", trip.getDistance() / 1000d));
+        else
+            km.setText(String.format("%d m", trip.getDistance()));
+        duration.setText(timeString(trip.getDuration()));
+
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_trip_info, container, false);
+        return view;
+    }
+
+    private String timeString(int time) {
+        int h = (time / (60 * 60));
+        int m = (time / (60 )) % 60;
+        String out = "";
+        if(h > 0)
+            out += "%1$d h ";
+        if(m > 0)
+            out += "%2$d min";
+        return String.format(out, h, m);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
     public void onButtonMapOpen(Trip trip) {
         if (mListener != null) {
             mListener.onInfoOpenMap(trip);
+        }
+    }
+
+    @Override
+    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            Point size = new Point();
+            getActivity().getWindowManager().getDefaultDisplay().getSize(size);
+            int cx = size.x / 2;
+            int cy = size.y / 2;
+            int finalRadius = (int) (Math.max(size.x, size.y) / 1.6d);
+            Animator anim = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
+
+            // make the view visible and start the animation
+            view.setVisibility(View.VISIBLE);
+            anim.start();
+        }
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            TransitionManager.beginDelayedTransition((ViewGroup) getView().getRootView(), new Fade());
         }
     }
 

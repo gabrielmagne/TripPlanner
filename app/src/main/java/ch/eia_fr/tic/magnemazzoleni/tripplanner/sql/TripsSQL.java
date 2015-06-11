@@ -30,7 +30,7 @@ public class TripsSQL {
         db.close();
     }
 
-    public Trip insert(LatLng departure, LatLng arrival, double distance, String name, int color, String departureAddress, String arrivalAddress) {
+    public Trip insert(LatLng departure, LatLng arrival, int distance, int duration, String name, int color, String departureAddress, String arrivalAddress) {
         ContentValues values = new ContentValues();
         values.put(TripSQLHelper.COL_NAME, name);
         values.put(TripSQLHelper.COL_DEP_ADDRESS, departureAddress);
@@ -40,6 +40,7 @@ public class TripsSQL {
         values.put(TripSQLHelper.COL_ARR_LAT, arrival.latitude);
         values.put(TripSQLHelper.COL_ARR_LNG, arrival.longitude);
         values.put(TripSQLHelper.COL_DISTANCE, distance);
+        values.put(TripSQLHelper.COL_DURATION, duration);
         values.put(TripSQLHelper.COL_COLOR, color);
 
         open();
@@ -67,10 +68,11 @@ public class TripsSQL {
         String arrivalAddress = cursor.getString(3);
         LatLng departure = new LatLng(cursor.getDouble(4), cursor.getDouble(5));
         LatLng arrival = new LatLng(cursor.getDouble(6), cursor.getDouble(7));
-        double distance = cursor.getDouble(8);
-        int color = cursor.getInt(9);
+        int distance = cursor.getInt(8);
+        int duration = cursor.getInt(9);
+        int color = cursor.getInt(10);
 
-        Trip p = new Trip(did, departure, arrival, distance, name, color, departureAddress, arrivalAddress);
+        Trip p = new Trip(did, departure, arrival, distance, duration, name, color, departureAddress, arrivalAddress);
         cursor.close();
         close();
         return  p;
@@ -86,6 +88,7 @@ public class TripsSQL {
         upd.put(TripSQLHelper.COL_ARR_LAT, item.getArrival().latitude);
         upd.put(TripSQLHelper.COL_ARR_LNG, item.getArrival().longitude);
         upd.put(TripSQLHelper.COL_DISTANCE, item.getDistance());
+        upd.put(TripSQLHelper.COL_DURATION, item.getDuration());
         upd.put(TripSQLHelper.COL_COLOR, item.getColor());
 
         open();
@@ -107,10 +110,11 @@ public class TripsSQL {
             String arrivalAddress = cursor.getString(3);
             LatLng departure = new LatLng(cursor.getDouble(4), cursor.getDouble(5));
             LatLng arrival = new LatLng(cursor.getDouble(6), cursor.getDouble(7));
-            double distance = cursor.getDouble(8);
-            int color = cursor.getInt(9);
+            int distance = cursor.getInt(8);
+            int duration = cursor.getInt(9);
+            int color = cursor.getInt(10);
 
-            Trip p = new Trip(id, departure, arrival, distance, name, color, departureAddress, arrivalAddress);
+            Trip p = new Trip(id, departure, arrival, distance, duration, name, color, departureAddress, arrivalAddress);
             tasks.add(p);
             cursor.moveToNext();
         }

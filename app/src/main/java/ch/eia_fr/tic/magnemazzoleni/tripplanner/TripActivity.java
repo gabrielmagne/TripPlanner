@@ -2,7 +2,9 @@ package ch.eia_fr.tic.magnemazzoleni.tripplanner;
 
 import android.animation.Animator;
 import android.annotation.TargetApi;
+import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.support.v4.app.FragmentActivity;
@@ -49,13 +51,23 @@ public class TripActivity extends ActionBarActivity
     }
 
     @Override
-    public void onTripSelectedItem(Trip trip) {
-        Log.i("Evt Select", trip.getId() + "");
+    public void openTripInfo(Trip trip) {
+        // open details
+        tripInfo = tripInfo.newInstance(trip);
+
+        ColorDrawable c = new ColorDrawable(trip.getColor());
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(trip.getColor() | 0xff000000));
+
+        // close fragment
+        fragmentManager.beginTransaction()
+                .add(R.id.fragment, tripInfo)
+                .addToBackStack("info")
+                .commit();
     }
 
     @Override
     public void showAddFragment() {
-        tripAdd = new TripAdd();
+        tripAdd = TripAdd.newInstance();
 
         fragmentManager.beginTransaction()
                 .add(R.id.fragment, tripAdd)
@@ -68,16 +80,24 @@ public class TripActivity extends ActionBarActivity
         // signal trip add
         tripList.signal(trip);
 
+        // open details
+        tripInfo = TripInfo.newInstance(trip);
+
+        // action bar
+        ColorDrawable c = new ColorDrawable(trip.getColor());
+        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(trip.getColor() | 0xff000000));
+
         // close fragment
+        fragmentManager.popBackStack();
         fragmentManager.beginTransaction()
                 .remove(tripAdd)
+                .add(R.id.fragment, tripInfo)
+                .addToBackStack("info")
                 .commit();
-        fragmentManager.popBackStack();
     }
 
     @Override
     public void onInfoOpenMap(Trip trip) {
         Log.i("Evt Info", trip.getId() + "");
     }
-
 }
