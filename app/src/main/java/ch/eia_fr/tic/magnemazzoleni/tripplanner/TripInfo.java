@@ -30,6 +30,7 @@ import ch.eia_fr.tic.magnemazzoleni.tripplanner.sql.Trip;
 public class TripInfo extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_TRIP = "trip";
+    public static final String TAG = "TRIP_INFO";
 
     private Trip trip;
 

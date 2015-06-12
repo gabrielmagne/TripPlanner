@@ -51,6 +51,7 @@ import ch.eia_fr.tic.magnemazzoleni.tripplanner.sql.TripsSQL;
  * create an instance of this fragment.
  */
 public class TripAdd extends Fragment implements OnMapReadyCallback {
+    public static final String TAG = "ADD_TRIP";
     private OnFragmentInteractionListener mListener;
 
     private GoogleMap mMap;
