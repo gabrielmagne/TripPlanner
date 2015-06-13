@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.rey.material.widget.FloatingActionButton;
+import com.rey.material.widget.Switch;
 
 import ch.eia_fr.tic.magnemazzoleni.tripplanner.sql.Trip;
 
@@ -47,6 +48,10 @@ public class TripInfo extends Fragment {
     private TextView km;
     private TextView duration;
     private FloatingActionButton maps;
+    private Switch sr;
+    private Switch sb;
+    private Switch sc;
+
 
     private int transX, transY;
 
@@ -106,6 +111,9 @@ public class TripInfo extends Fragment {
         km = (TextView) view.findViewById(R.id.info_km);
         duration = (TextView) view.findViewById(R.id.info_time);
         maps = (FloatingActionButton) view.findViewById(R.id.info_maps);
+        sr = (Switch) view.findViewById(R.id.switch_restaurants);
+        sb = (Switch) view.findViewById(R.id.switch_bars);
+        sc = (Switch) view.findViewById(R.id.switch_culture);
 
         // fill with trip
         tripname.setText(trip.getName());
@@ -147,7 +155,7 @@ public class TripInfo extends Fragment {
             int w = maps.getWidth() / 2;
             maps.getLocationOnScreen(pos);
             Point ppos = new Point(pos[0] + w, pos[1] + w);
-            mListener.onInfoOpenMap(trip, ppos);
+            mListener.onInfoOpenMap(trip, ppos, sr.isChecked(), sb.isChecked(), sc.isChecked());
         }
     }
 
@@ -205,7 +213,7 @@ public class TripInfo extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        public void onInfoOpenMap(Trip trip, Point pos);
+        public void onInfoOpenMap(Trip trip, Point pos, boolean restaurants, boolean bars, boolean places);
     }
 
 }

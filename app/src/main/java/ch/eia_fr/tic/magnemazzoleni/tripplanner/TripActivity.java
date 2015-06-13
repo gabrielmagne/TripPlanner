@@ -89,8 +89,8 @@ public class TripActivity extends AppCompatActivity
     }
 
     @Override
-    public void onInfoOpenMap(Trip trip, Point pos) {
-        tripMap = TripMap.newInstance(trip, pos);
+    public void onInfoOpenMap(Trip trip, Point pos, boolean res, boolean bars, boolean culture) {
+        tripMap = TripMap.newInstance(trip, pos , res, bars, culture);
 
         fragmentManager.beginTransaction()
                 .add(R.id.fragment, tripMap)

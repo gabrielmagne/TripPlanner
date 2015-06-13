@@ -19,12 +19,16 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 
+import com.google.android.gms.appindexing.AndroidAppUri;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
@@ -36,6 +40,9 @@ import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.json.JSONStringer;
+
+import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -56,11 +63,18 @@ public class TripMap extends Fragment implements OnMapReadyCallback {
     private static final String ARG_TRIP = "trip";
     private static final String ARG_POS_X = "posX";
     private static final String ARG_POS_Y = "posY";
+    private static final String ARG_FOOD = "food";
+    private static final String ARG_BAR = "bar";
+    private static final String ARG_PLACES = "places";
+
 
     public static final String TAG = "MAPS";
 
     private GoogleMap mMap;
     private int transX, transY;
+    private boolean food, bar, places;
+
+    private final int MAX_PLACES = 20;
 
     private Trip trip;
 
@@ -75,12 +89,15 @@ public class TripMap extends Fragment implements OnMapReadyCallback {
      * @return A new instance of fragment TripMap.
      */
     // TODO: Rename and change types and number of parameters
-    public static TripMap newInstance(Trip trip, Point pos) {
+    public static TripMap newInstance(Trip trip, Point pos, boolean food, boolean bar, boolean places) {
         TripMap fragment = new TripMap();
         Bundle args = new Bundle();
         args.putSerializable(ARG_TRIP, trip);
         args.putInt(ARG_POS_X, pos.x);
         args.putInt(ARG_POS_Y, pos.y);
+        args.putBoolean(ARG_FOOD, food);
+        args.putBoolean(ARG_BAR, bar);
+        args.putBoolean(ARG_PLACES, places);
         fragment.setArguments(args);
         return fragment;
     }
@@ -95,6 +112,9 @@ public class TripMap extends Fragment implements OnMapReadyCallback {
             trip = (Trip) getArguments().getSerializable(ARG_TRIP);
             transX = getArguments().getInt(ARG_POS_X);
             transY = getArguments().getInt(ARG_POS_Y);
+            food = getArguments().getBoolean(ARG_FOOD);
+            bar = getArguments().getBoolean(ARG_BAR);
+            places = getArguments().getBoolean(ARG_PLACES);
         }
     }
 
@@ -113,13 +133,29 @@ public class TripMap extends Fragment implements OnMapReadyCallback {
 
         String posURI = "https://maps.googleapis.com/maps/api/directions/json";
         RequestParams params = new RequestParams();
-        params.add("origin", String.format("%f,%f", trip.getDeparture().latitude, trip.getDeparture().longitude));
-        params.add("destination", String.format("%f,%f", trip.getArrival().latitude, trip.getArrival().longitude));
+        params.add("origin", trip.getDeparture().latitude + "," + trip.getDeparture().longitude);
+        params.add("destination", trip.getArrival().latitude + "," + trip.getArrival().longitude);
 
         client.get(getActivity(), posURI, params, directions);
 
         // Inflate the layout for this fragment
         return view;
+    }
+
+    public void handleInterests(LatLng position) {
+        String interestURI = "https://maps.googleapis.com/maps/api/place/nearbysearch/json";
+        RequestParams paramsInterest = new RequestParams();
+        paramsInterest.add("location", position.latitude + "," + position.longitude);
+        paramsInterest.add("radius", "1000");
+        paramsInterest.add("sensor", "true");
+        String types = "";
+        if (bar) types += "bar|";
+        if (food) types += "food|";
+        if (places) types += "art_gallery|museum|";
+        paramsInterest.add("types", types);
+        paramsInterest.add("key", getActivity().getResources().getString(R.string.google_server_key));
+
+        client.get(getActivity(), interestURI, paramsInterest, interests);
     }
 
     @Override
@@ -193,6 +229,11 @@ public class TripMap extends Fragment implements OnMapReadyCallback {
         // Check if we were successful in obtaining the map.
         if (mMap != null) {
             setUpMap();
+            // no interests to show
+            if (bar|food|places == true){
+                handleInterests(trip.getDeparture());
+                handleInterests(trip.getArrival());
+            }
         }
     }
 
@@ -260,6 +301,74 @@ public class TripMap extends Fragment implements OnMapReadyCallback {
                 mMap.addPolyline(options);
             } catch (JSONException e) {
                 sendRetryMessage(RETRY_MESSAGE);
+            }
+        }
+    };
+
+    private JsonHttpResponseHandler interests = new JsonHttpResponseHandler() {
+        @Override
+        public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
+            super.onSuccess(statusCode, headers, response);
+
+            MarkerOptions[] places = null;
+
+            try {
+                JSONArray placesArray = response.getJSONArray("results");
+                places = new MarkerOptions[placesArray.length()];
+                for (int p=0; p<placesArray.length(); p++) {
+                    boolean missingValue=false;
+                    LatLng placeLL=null;
+                    String placeName="";
+                    String vicinity="";
+                    int currIcon =R.mipmap.ic_marker_red;
+                    try {
+                        missingValue=false;
+                        JSONObject placeObject = placesArray.getJSONObject(p);
+                        JSONObject loc = placeObject.getJSONObject("geometry").getJSONObject("location");
+                        placeLL = new LatLng(
+                                Double.valueOf(loc.getString("lat")),
+                                Double.valueOf(loc.getString("lng")));
+                        JSONArray types = placeObject.getJSONArray("types");
+                        for(int t=0; t<types.length(); t++){
+                            String thisType=types.get(t).toString();
+                            switch (thisType) {
+                                case "food":
+                                    currIcon = R.mipmap.ic_marker_yellow;
+                                    break;
+                                case "bar":
+                                    currIcon = R.mipmap.ic_marker_blue;
+                                    break;
+                                case "museum":
+                                case "art-galery":
+                                    currIcon = R.mipmap.ic_marker_green;
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                        vicinity = placeObject.getString("vicinity");
+                        placeName = placeObject.getString("name");
+                    } catch (JSONException jse) {
+                        missingValue=true;
+                        jse.printStackTrace();
+                    }
+                    if(missingValue) places[p]=null;
+                    else
+                        places[p]=new MarkerOptions()
+                                .position(placeLL)
+                                .title(placeName)
+                                .icon(BitmapDescriptorFactory.fromResource(currIcon))
+                                .snippet(vicinity);
+                }
+            } catch (JSONException e) {
+                sendRetryMessage(RETRY_MESSAGE);
+            }
+            if(places!=null){
+                for(int p=0; p<places.length; p++){
+                    //will be null if a value was missing
+                    if(places[p]!=null)
+                        mMap.addMarker(places[p]);
+                }
             }
         }
     };
