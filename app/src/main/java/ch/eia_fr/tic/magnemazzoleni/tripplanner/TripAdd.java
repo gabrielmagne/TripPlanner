@@ -21,8 +21,12 @@ import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
+import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.Marker;
+import com.rey.material.app.Dialog;
+import com.rey.material.app.SimpleDialog;
 import com.rey.material.widget.FloatingActionButton;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -60,12 +64,13 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
     private OnFragmentInteractionListener mListener;
 
     private GoogleMap mMap;
+    private Marker departureMarker = null;
+    private Marker arrivalMarker = null;
     private FloatingActionButton btnAdd;
     private int transX, transY;
 
     private String fromID = null;
     private String toID = null;
-    private boolean loading = false;
 
     private String departure = null;
     private String arrival = null;
@@ -73,10 +78,9 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
     private LatLng latLngArr;
     private int distance;
     private int duration;
+    String title;
 
     private static AsyncHttpClient client = new AsyncHttpClient();
-
-    private int successfulResponses = 0;
 
     /**
      * Use this factory method to create a new instance of
@@ -128,6 +132,9 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
             }
         });
 
+        // lat lng position API
+        final String posURI = "https://maps.googleapis.com/maps/api/place/details/json";
+
         // autocomplete for from
         final AutoCompleteTextView from = (AutoCompleteTextView) view.findViewById(R.id.add_from);
         final AutocompleteAdapter fromAdapter = new AutocompleteAdapter(getActivity(), android.R.layout.simple_list_item_1);
@@ -140,6 +147,11 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
                     departure = obj.getString("description");
                     fromID = obj.getString("place_id");
                     from.setText(departure);
+                    // look for departure lat lng
+                    RequestParams depParams = new RequestParams();
+                    depParams.add("placeid", fromID);
+                    depParams.add("key", getActivity().getResources().getString(R.string.google_server_key));
+                    client.get(getActivity(), posURI, depParams, departureResponse);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -158,6 +170,11 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
                     arrival = obj.getString("description");
                     toID = obj.getString("place_id");
                     to.setText(arrival);
+                    // look for arrival lat lng
+                    final RequestParams arrParams = new RequestParams();
+                    arrParams.add("placeid", toID);
+                    arrParams.add("key", getActivity().getResources().getString(R.string.google_server_key));
+                    client.get(getActivity(), posURI, arrParams, arrivalResponse);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -198,33 +215,16 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
     public void onAddPressed() {
 
         if(fromID == null || toID == null) {
-            Toast.makeText(getActivity(), "Please, select 2 locations", Toast.LENGTH_LONG);
+            Toast.makeText(getActivity(), "Please, select 2 locations", Toast.LENGTH_LONG).show();
             return;
         }
 
-        if(loading) return;
-
-        loading = true;
-
         // start asking google for more informations
-        String posURI = "https://maps.googleapis.com/maps/api/place/details/json";
         String disURI = "https://maps.googleapis.com/maps/api/distancematrix/json";
-        RequestParams depParams = new RequestParams();
-        RequestParams arrParams = new RequestParams();
         RequestParams disParams = new RequestParams();
-
-        depParams.add("placeid", fromID);
-        depParams.add("key", getActivity().getResources().getString(R.string.google_server_key));
-        arrParams.add("placeid", toID);
-        arrParams.add("key", getActivity().getResources().getString(R.string.google_server_key));
 
         disParams.add("origins", departure);
         disParams.add("destinations", arrival);
-
-        // look for departure lat lng
-        client.get(getActivity(), posURI, depParams, departureResponse);
-        // look for arrival lat lng
-        client.get(getActivity(), posURI, arrParams, arrivalResponse);
         // look for distance from target
         client.get(getActivity(), disURI, disParams, distanceResponse);
     }
@@ -233,19 +233,14 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
      * When all three request are done, continue adding the trip
      */
     private void handleAdd() {
-        if(++successfulResponses < 3) return;
-
-        Log.i("TripAdd", "All params get");
-
         TripsSQL sql = new TripsSQL(getActivity());
 
-        // TODO: the name of the trip should be specified somewhere
         Trip trip =  sql.insert(
             latLngDep,
             latLngArr,
             distance,
             duration,
-            "" + Math.random(),
+            title,
             Utils.generateRandomColor(),
             departure,
             arrival
@@ -302,19 +297,36 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    private void setUpMap() {
-        MarkerOptions mo = new MarkerOptions().position(new LatLng(0, 0)).title("Marker").draggable(true);
-        mMap.addMarker(mo);
-    }
-
-    @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
+
         // Check if we were successful in obtaining the map.
         if (mMap != null) {
-            setUpMap();
+            if(departureMarker == null) {
+                MarkerOptions optsDep = new MarkerOptions();
+                optsDep.position(new LatLng(0, 0));
+                optsDep.visible(false);
+                departureMarker = mMap.addMarker(optsDep);
+            }
+            if(arrivalMarker == null) {
+                MarkerOptions optsArr = new MarkerOptions();
+                optsArr.position(new LatLng(0, 0));
+                optsArr.visible(false);
+                arrivalMarker = mMap.addMarker(optsArr);
+            }
         }
     }
+
+    private void moveDepartureMarker() {
+        departureMarker.setPosition(latLngDep);
+        departureMarker.setVisible(true);
+    }
+
+    private void moveArrivalMarker() {
+        arrivalMarker.setPosition(latLngArr);
+        arrivalMarker.setVisible(true);
+    }
+
 
     /**
      * This interface must be implemented by activities that contain this
@@ -346,7 +358,7 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
                         location.getDouble("lng")
                 );
 
-                handleAdd();
+                moveDepartureMarker();
             } catch (JSONException e) {
                 sendRetryMessage(RETRY_MESSAGE);
             }
@@ -367,8 +379,7 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
                         location.getDouble("lat"),
                         location.getDouble("lng")
                 );
-
-                handleAdd();
+                moveArrivalMarker();
             } catch (JSONException e) {
                 sendRetryMessage(RETRY_MESSAGE);
             }
@@ -382,19 +393,59 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
         @Override
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
             try {
-                // TODO 0 results handling
                 JSONObject values = response.getJSONArray("rows")
                         .getJSONObject(0)
                         .getJSONArray("elements")
                         .getJSONObject(0);
 
+                String status = values.getString("status");
+                if(!status.equals("OK")) {
+                    Toast.makeText(getActivity(), "No route found, retry", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
                 distance = values.getJSONObject("distance").getInt("value");
                 duration = values.getJSONObject("duration").getInt("value");
 
-                handleAdd();
+                openNameDialog();
             } catch (JSONException e) {
                 sendRetryMessage(RETRY_MESSAGE);
             }
         }
     };
+
+    private void openNameDialog() {
+        final SimpleDialog dialog = new SimpleDialog(getActivity());
+        dialog.title("Trip Title")
+              .positiveAction("ADD")
+              .negativeAction("CANCEL")
+              .contentView(R.layout.add_dialog)
+              .cancelable(true)
+              .show();
+
+        dialog.positiveActionClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                EditText text = (EditText) dialog.findViewById(R.id.add_dialog_text);
+                String title = text.getText().toString().trim();
+
+                if (title.equals("")) {
+                    Toast.makeText(getActivity(), "A title is needed", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                TripAdd.this.title = title;
+
+                dialog.dismiss();
+                handleAdd();
+            }
+        });
+
+        dialog.negativeActionClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                dialog.dismiss();
+            }
+        });
+    }
 }
