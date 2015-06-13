@@ -8,6 +8,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.transition.Fade;
 import android.transition.TransitionManager;
 import android.view.LayoutInflater;
@@ -73,8 +75,16 @@ public class TripInfo extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_trip_info, container, false);
 
+        // set toolbar
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setTitle(R.string.app_name);
+            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
         // background
-        LinearLayout layout = (LinearLayout) view.findViewById(R.id.fragment_trip_info);
+        ViewGroup layout = (ViewGroup) view.findViewById(R.id.fragment_trip_info);
         layout.setBackground(new ColorDrawable(Utils.lighterColor(trip.getColor()) | 0xff000000));
 
         // elements

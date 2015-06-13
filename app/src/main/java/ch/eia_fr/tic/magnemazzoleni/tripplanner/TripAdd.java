@@ -9,6 +9,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.transition.Fade;
 import android.transition.TransitionManager;
 import android.util.Log;
@@ -21,7 +23,7 @@ import android.widget.AdapterView;
 import android.widget.AutoCompleteTextView;
 import android.widget.Toast;
 
-import com.gc.materialdesign.views.ButtonFloat;
+import com.rey.material.widget.FloatingActionButton;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -99,7 +101,15 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
         View view = inflater.inflate(R.layout.fragment_trip_add, container, false);
         setUpMapIfNeeded();
 
-        ButtonFloat btn = (ButtonFloat) view.findViewById(R.id.add_save);
+        // set toolbar
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setTitle(R.string.app_name);
+            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
+
+        FloatingActionButton btn = (FloatingActionButton) view.findViewById(R.id.add_save);
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

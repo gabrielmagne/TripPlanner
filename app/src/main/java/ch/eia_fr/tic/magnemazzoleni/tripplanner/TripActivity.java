@@ -8,11 +8,12 @@ import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
-import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -24,11 +25,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewAnimationUtils;
 
-import com.gc.materialdesign.views.CustomView;
-
 import ch.eia_fr.tic.magnemazzoleni.tripplanner.sql.Trip;
 
-public class TripActivity extends ActionBarActivity
+public class TripActivity extends AppCompatActivity
         implements TripFragment.OnFragmentInteractionListener,
                      TripAdd.OnFragmentInteractionListener,
                      TripInfo.OnFragmentInteractionListener,
@@ -47,17 +46,8 @@ public class TripActivity extends ActionBarActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip);
 
-        getSupportActionBar().setCustomView(new CustomView(this, null));
-        getSupportActionBar().setDisplayShowCustomEnabled(true);
-
         fragmentManager = getSupportFragmentManager();
         fragmentManager.addOnBackStackChangedListener(this);
-        // whitr bg
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-        // back text
-        Spannable text = new SpannableString(getSupportActionBar().getTitle());
-        text.setSpan(new ForegroundColorSpan(Color.BLACK), 0, text.length(), Spannable.SPAN_INCLUSIVE_INCLUSIVE);
-        getSupportActionBar().setTitle(text);
 
         tripList = (TripFragment) fragmentManager.getFragments().get(0);
     }
@@ -73,12 +63,13 @@ public class TripActivity extends ActionBarActivity
         tripInfo = tripInfo.newInstance(trip);
 
         ColorDrawable c = new ColorDrawable(trip.getColor());
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(trip.getColor() | 0xff000000));
+        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(trip.getColor() | 0xff000000));
 
         // close fragment
         fragmentManager.beginTransaction()
                 .add(R.id.fragment, tripInfo)
                 .addToBackStack(TripInfo.TAG)
+                //.hide(tripList)
                 .commit();
     }
 
@@ -89,6 +80,7 @@ public class TripActivity extends ActionBarActivity
         fragmentManager.beginTransaction()
                 .add(R.id.fragment, tripAdd)
                 .addToBackStack(TripAdd.TAG)
+                //.hide(tripList)
                 .commit();
     }
 
@@ -102,13 +94,14 @@ public class TripActivity extends ActionBarActivity
 
         // action bar
         ColorDrawable c = new ColorDrawable(trip.getColor());
-        getSupportActionBar().setBackgroundDrawable(new ColorDrawable(trip.getColor() | 0xff000000));
+        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(trip.getColor() | 0xff000000));
 
         // close fragment
         fragmentManager.popBackStack();
         fragmentManager.beginTransaction()
                 .add(R.id.fragment, tripInfo)
                 .addToBackStack(TripInfo.TAG)
+                //.hide(tripAdd)
                 .commit();
     }
 
@@ -121,19 +114,10 @@ public class TripActivity extends ActionBarActivity
     public void onBackStackChanged() {
         Log.i("BACK", fragmentManager.getBackStackEntryCount() + "");
         if(fragmentManager.getBackStackEntryCount() == 0) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
-
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                View view = getSupportActionBar().getCustomView();
-                getSupportActionBar().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
-
-                Animator anim = ViewAnimationUtils.createCircularReveal(view, 0, 0, 0, 1000);
-
-                anim.start();
-            }
+            //getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
         else {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
     }
 

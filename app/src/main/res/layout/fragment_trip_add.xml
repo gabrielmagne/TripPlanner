@@ -1,5 +1,4 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -8,60 +7,17 @@
     android:background="@android:color/background_light"
     android:clickable="true">
 
-    <fragment
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:id="@+id/map_add"
-        android:name="com.google.android.gms.maps.SupportMapFragment"
-        android:layout_alignParentLeft="true"
-        android:layout_marginLeft="0dp"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="0dp">
-    </fragment>
-
-    <LinearLayout
+    <android.support.v7.widget.Toolbar
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/toolbar"
+        android:minHeight="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@android:drawable/picture_frame"
-        android:layout_marginTop="24dp"
-        android:layout_marginLeft="24dp"
-        android:layout_marginRight="24dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/linearLayout">
+        android:theme="@style/ThemeOverlay.AppCompat.Light"
+        android:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-        <AutoCompleteTextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/add_from"
-            android:background="#ffffff"
-            android:padding="4dp"
-            android:hint="From"
-            android:singleLine="true" />
-    </LinearLayout>
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@android:drawable/picture_frame"
-        android:layout_below="@+id/linearLayout"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="24dp"
-        android:layout_marginRight="24dp"
-        android:layout_marginBottom="24dp">
-
-        <AutoCompleteTextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/add_to"
-            android:background="#ffffff"
-            android:padding="4dp"
-            android:hint="To"
-            android:singleLine="true" />
-    </LinearLayout>
-
-    <com.gc.materialdesign.views.ButtonFloat
+    <!--<com.gc.materialdesign.views.ButtonFloat
         android:id="@+id/add_save"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -71,18 +27,77 @@
         android:layout_marginBottom="24dp"
         android:background="#ffe52d24"
         app:animate="false"
-        app:iconDrawable="@mipmap/ic_action_new"/>
+        app:iconDrawable="@mipmap/ic_action_new"/>-->
 
-    <!--
-    <com.rey.material.widget.FloatingActionButton
-        android:id="@+id/add_save"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
-        android:layout_marginRight="24dp"
-        android:layout_marginBottom="24dp"
-        app:fab_background="#ffe52d24"
-        app:fab_iconSrc="@mipmap/ic_action_new" />-->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar">
+
+        <fragment
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/map_add"
+            android:name="com.google.android.gms.maps.SupportMapFragment"
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="0dp"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="0dp">
+        </fragment>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/picture_frame"
+            android:layout_marginTop="24dp"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/linearLayout">
+
+            <AutoCompleteTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/add_from"
+                android:background="#ffffff"
+                android:padding="4dp"
+                android:hint="From"
+                android:singleLine="true" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:drawable/picture_frame"
+            android:layout_below="@+id/linearLayout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:layout_marginBottom="24dp">
+
+            <AutoCompleteTextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:id="@+id/add_to"
+                android:background="#ffffff"
+                android:padding="4dp"
+                android:hint="To"
+                android:singleLine="true" />
+        </LinearLayout>
+
+        <com.rey.material.widget.FloatingActionButton
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/add_save"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="24dp"
+            android:layout_marginBottom="24dp"
+            app:fab_iconSrc="@mipmap/ic_action_new"
+            app:fab_backgroundColor="#ffe52d24" />
+    </RelativeLayout>
 
 </RelativeLayout>

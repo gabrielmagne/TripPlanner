@@ -3,6 +3,11 @@ package ch.eia_fr.tic.magnemazzoleni.tripplanner;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,7 +18,7 @@ import android.widget.BaseAdapter;
 import android.widget.ListAdapter;
 import android.widget.TextView;
 
-import com.gc.materialdesign.views.ButtonFloat;
+import com.rey.material.widget.FloatingActionButton;
 
 import java.util.List;
 
@@ -29,25 +34,17 @@ import ch.eia_fr.tic.magnemazzoleni.tripplanner.sql.TripsSQL;
  * Activities containing this fragment MUST implement the {@link OnFragmentInteractionListener}
  * interface.
  */
-public class TripFragment extends Fragment implements AbsListView.OnItemClickListener {
-
-    private TripsSQL tripsSQL;
-    private List<Trip> tripList;
+public class TripFragment extends Fragment {
 
     private OnFragmentInteractionListener mListener;
 
-    private ButtonFloat btnAdd;
+    private FloatingActionButton btnAdd;
 
     /**
      * The fragment's ListView/GridView.
      */
-    private AbsListView mListView;
-
-    /**
-     * The Adapter which will be used to populate the ListView/GridView with
-     * Views.
-     */
-    private ListAdapter mAdapter;
+    private RecyclerView recyclerView;
+    private TripAdapter tripAdapter;
 
     public static TripFragment newInstance() {
         TripFragment fragment = new TripFragment();
@@ -66,12 +63,6 @@ public class TripFragment extends Fragment implements AbsListView.OnItemClickLis
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        tripsSQL = new TripsSQL(getActivity().getApplicationContext());
-        tripList = tripsSQL.getAll();
-
-        mAdapter = new ArrayAdapter<Trip>(getActivity(),
-                android.R.layout.simple_list_item_1, android.R.id.text1, tripList);
     }
 
     @Override
@@ -79,15 +70,24 @@ public class TripFragment extends Fragment implements AbsListView.OnItemClickLis
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_trip, container, false);
 
-        // Set the adapter
-        mListView = (AbsListView) view.findViewById(android.R.id.list);
-        mListView.setAdapter(mAdapter);
+        // set toolbar
+        Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        if (toolbar != null) {
+            toolbar.setTitle(R.string.app_name);
+            ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
+        }
 
-        // Set OnItemClickListener so we can be notified on item clicks
-        mListView.setOnItemClickListener(this);
+        // start recycle view
+        recyclerView = (RecyclerView) view.findViewById(R.id.list_cards);
+        tripAdapter = new TripAdapter(getActivity(), mListener);
+        // setup
+        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(llm);
+        recyclerView.setAdapter(tripAdapter);
 
         // floating button
-        btnAdd = (ButtonFloat) view.findViewById(R.id.list_add_trip);
+        btnAdd = (FloatingActionButton) view.findViewById(R.id.list_add_trip);
 
         // tell activity to switch fragment
         btnAdd.setOnClickListener(new View.OnClickListener() {
@@ -117,31 +117,8 @@ public class TripFragment extends Fragment implements AbsListView.OnItemClickLis
         mListener = null;
     }
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (null != mListener) {
-            // Notify the active callbacks interface (the activity, if the
-            // fragment is attached to one) that an item has been selected.
-            mListener.openTripInfo(tripList.get(position));
-        }
-    }
-
-    /**
-     * The default content for this Fragment has a TextView that is shown when
-     * the list is empty. If you would like to change the text, call this method
-     * to supply the text it should use.
-     */
-    public void setEmptyText(CharSequence emptyText) {
-        View emptyView = mListView.getEmptyView();
-
-        if (emptyView instanceof TextView) {
-            ((TextView) emptyView).setText(emptyText);
-        }
-    }
-
     public void signal(Trip trip) {
-        tripList.add(0, trip);
-        ((BaseAdapter) mAdapter).notifyDataSetChanged();
+        tripAdapter.add(trip);
     }
 
     /**
