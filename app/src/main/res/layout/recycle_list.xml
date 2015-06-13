@@ -45,7 +45,8 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="#from"
                 android:id="@+id/recycle_from"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:singleLine="true" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -53,7 +54,8 @@
                 android:textAppearance="?android:attr/textAppearanceMedium"
                 android:text="#to"
                 android:id="@+id/recycle_to"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:singleLine="true" />
         </LinearLayout>
     </LinearLayout>
 
