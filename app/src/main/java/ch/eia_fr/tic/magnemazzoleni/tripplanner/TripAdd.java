@@ -54,9 +54,14 @@ import ch.eia_fr.tic.magnemazzoleni.tripplanner.sql.TripsSQL;
  */
 public class TripAdd extends Fragment implements OnMapReadyCallback {
     public static final String TAG = "ADD_TRIP";
+    public static final String ARG_POS_X = "posX";
+    public static final String ARG_POS_Y = "posY";
+
     private OnFragmentInteractionListener mListener;
 
     private GoogleMap mMap;
+    private FloatingActionButton btnAdd;
+    private int transX, transY;
 
     private String fromID = null;
     private String toID = null;
@@ -79,9 +84,11 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
      *
      * @return A new instance of fragment TripAdd.
      */
-    public static TripAdd newInstance() {
+    public static TripAdd newInstance(Point pos) {
         TripAdd fragment = new TripAdd();
         Bundle args = new Bundle();
+        args.putInt(ARG_POS_X, pos.x);
+        args.putInt(ARG_POS_Y, pos.y);
         fragment.setArguments(args);
         return fragment;
     }
@@ -93,6 +100,10 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            transX = getArguments().getInt(ARG_POS_X);
+            transY = getArguments().getInt(ARG_POS_Y);
+        }
     }
 
     @Override
@@ -106,11 +117,11 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
         if (toolbar != null) {
             toolbar.setTitle(R.string.app_name);
             ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(false);
         }
 
-        FloatingActionButton btn = (FloatingActionButton) view.findViewById(R.id.add_save);
-        btn.setOnClickListener(new View.OnClickListener() {
+        btnAdd = (FloatingActionButton) view.findViewById(R.id.add_save);
+        btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onAddPressed();
@@ -164,9 +175,9 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Point size = new Point();
             getActivity().getWindowManager().getDefaultDisplay().getSize(size);
-            int cx = size.x / 2;
-            int cy = size.y / 2;
-            int finalRadius = (int) (Math.max(size.x, size.y) / 1.6d);
+            int cx = transX;
+            int cy = transY;
+            int finalRadius = Math.max(size.x, size.y);
             Animator anim = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
 
             // make the view visible and start the animation
@@ -251,7 +262,11 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
         );
 
         if (mListener != null) {
-            mListener.onAddTrip(trip);
+            int[] pos = new int[2];
+            int w = btnAdd.getWidth() / 2;
+            btnAdd.getLocationOnScreen(pos);
+            Point ppos = new Point(pos[0] + w, pos[1] + w);
+            mListener.onAddTrip(trip, ppos);
         }
     }
 
@@ -319,7 +334,7 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        public void onAddTrip(Trip trip);
+        public void onAddTrip(Trip trip, Point point);
     }
 
     // Async task objects

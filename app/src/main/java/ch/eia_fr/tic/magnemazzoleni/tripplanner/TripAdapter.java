@@ -1,6 +1,7 @@
 package ch.eia_fr.tic.magnemazzoleni.tripplanner;
 
 import android.content.Context;
+import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.support.v7.internal.view.menu.MenuView;
 import android.support.v7.widget.RecyclerView;
@@ -40,7 +41,7 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
     }
 
     @Override
-    public void onBindViewHolder(TripViewHolder tripViewHolder, int i) {
+    public void onBindViewHolder(final TripViewHolder tripViewHolder, int i) {
         // item
         final Trip trip = tripList.get(i);
         // set view
@@ -53,7 +54,11 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
         tripViewHolder.container.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                callback.openTripInfo(trip);
+                int[] pos = new int[2];
+                int h = tripViewHolder.color.getHeight() / 2;
+                tripViewHolder.color.getLocationOnScreen(pos);
+                Point ppoint = new Point(pos[0], pos[1] + h);
+                callback.openTripInfo(trip, ppoint);
             }
         });
     }

@@ -32,6 +32,8 @@ import ch.eia_fr.tic.magnemazzoleni.tripplanner.sql.Trip;
 public class TripInfo extends Fragment {
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_TRIP = "trip";
+    private static final String ARG_POS_X = "posX";
+    private static final String ARG_POS_Y = "posY";
     public static final String TAG = "TRIP_INFO";
 
     private Trip trip;
@@ -42,6 +44,8 @@ public class TripInfo extends Fragment {
     private TextView km;
     private TextView duration;
 
+    private int transX, transY;
+
     private OnFragmentInteractionListener mListener;
 
     /**
@@ -51,10 +55,12 @@ public class TripInfo extends Fragment {
      * @param trip Parameter 1.
      * @return A new instance of fragment TripInfo.
      */
-    public static TripInfo newInstance(Trip trip) {
+    public static TripInfo newInstance(Trip trip, Point animStart) {
         TripInfo fragment = new TripInfo();
         Bundle args = new Bundle();
         args.putSerializable(ARG_TRIP, trip);
+        args.putSerializable(ARG_POS_X, animStart.x);
+        args.putSerializable(ARG_POS_Y, animStart.y);
         fragment.setArguments(args);
         return fragment;
     }
@@ -67,6 +73,8 @@ public class TripInfo extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             trip = (Trip) getArguments().getSerializable(ARG_TRIP);
+            transX = getArguments().getInt(ARG_POS_X);
+            transY = getArguments().getInt(ARG_POS_Y);
         }
     }
 
@@ -80,7 +88,7 @@ public class TripInfo extends Fragment {
         if (toolbar != null) {
             toolbar.setTitle(R.string.app_name);
             ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(true);
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(false);
         }
 
         // background
@@ -103,6 +111,7 @@ public class TripInfo extends Fragment {
         else
             km.setText(String.format("%d m", trip.getDistance()));
         duration.setText(timeString(trip.getDuration()));
+        toolbar.setBackground(new ColorDrawable(trip.getColor() | 0xff000000));
 
         // Inflate the layout for this fragment
         return view;
@@ -133,9 +142,9 @@ public class TripInfo extends Fragment {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Point size = new Point();
             getActivity().getWindowManager().getDefaultDisplay().getSize(size);
-            int cx = size.x / 2;
-            int cy = size.y / 2;
-            int finalRadius = (int) (Math.max(size.x, size.y) / 1.6d);
+            int cx = transX;
+            int cy = transY;
+            int finalRadius = Math.max(size.x, size.y);
             Animator anim = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
 
             // make the view visible and start the animation

@@ -1,6 +1,7 @@
 package ch.eia_fr.tic.magnemazzoleni.tripplanner;
 
 import android.app.Activity;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -93,7 +94,11 @@ public class TripFragment extends Fragment {
         btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                mListener.showAddFragment();
+                int[] pos = new int[2];
+                int w = btnAdd.getWidth() / 2;
+                btnAdd.getLocationOnScreen(pos);
+                Point ppos = new Point(pos[0] + w, pos[1] + w);
+                mListener.showAddFragment(ppos);
             }
         });
 
@@ -132,8 +137,8 @@ public class TripFragment extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        public void openTripInfo(Trip trip);
-        public void showAddFragment();
+        public void openTripInfo(Trip trip, Point point);
+        public void showAddFragment(Point point);
     }
 
 }

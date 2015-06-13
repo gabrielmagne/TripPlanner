@@ -1,29 +1,13 @@
 package ch.eia_fr.tic.magnemazzoleni.tripplanner;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
-import android.annotation.TargetApi;
-import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.ShareActionProvider;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
-import android.transition.TransitionInflater;
 import android.util.Log;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.ViewAnimationUtils;
 
 import ch.eia_fr.tic.magnemazzoleni.tripplanner.sql.Trip;
 
@@ -58,9 +42,9 @@ public class TripActivity extends AppCompatActivity
     }
 
     @Override
-    public void openTripInfo(Trip trip) {
+    public void openTripInfo(Trip trip, Point point) {
         // open details
-        tripInfo = tripInfo.newInstance(trip);
+        tripInfo = tripInfo.newInstance(trip, point);
 
         ColorDrawable c = new ColorDrawable(trip.getColor());
         //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(trip.getColor() | 0xff000000));
@@ -74,8 +58,8 @@ public class TripActivity extends AppCompatActivity
     }
 
     @Override
-    public void showAddFragment() {
-        tripAdd = TripAdd.newInstance();
+    public void showAddFragment(Point point) {
+        tripAdd = TripAdd.newInstance(point);
 
         fragmentManager.beginTransaction()
                 .add(R.id.fragment, tripAdd)
@@ -85,12 +69,12 @@ public class TripActivity extends AppCompatActivity
     }
 
     @Override
-    public void onAddTrip(Trip trip) {
+    public void onAddTrip(Trip trip, Point point) {
         // signal trip add
         tripList.signal(trip);
 
         // open details
-        tripInfo = TripInfo.newInstance(trip);
+        tripInfo = TripInfo.newInstance(trip, point);
 
         // action bar
         ColorDrawable c = new ColorDrawable(trip.getColor());
