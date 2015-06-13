@@ -4,6 +4,7 @@ import android.animation.Animator;
 import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.graphics.drawable.ColorDrawable;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
@@ -128,6 +129,7 @@ public class TripMap extends Fragment implements OnMapReadyCallback {
         Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
         if (toolbar != null) {
             toolbar.setTitle(R.string.app_name);
+            toolbar.setBackground(new ColorDrawable(trip.getColor() | 0xff000000));
             ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         }
 
@@ -270,7 +272,7 @@ public class TripMap extends Fragment implements OnMapReadyCallback {
 
                 LatLngBounds bounds = new LatLngBounds(sw, ne);
 
-                mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
+                mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
 
                 JSONArray values = response.getJSONArray("routes")
                         .getJSONObject(0)
@@ -325,9 +327,8 @@ public class TripMap extends Fragment implements OnMapReadyCallback {
                         missingValue=false;
                         JSONObject placeObject = placesArray.getJSONObject(p);
                         JSONObject loc = placeObject.getJSONObject("geometry").getJSONObject("location");
-                        placeLL = new LatLng(
-                                Double.valueOf(loc.getString("lat")),
-                                Double.valueOf(loc.getString("lng")));
+                        placeLL = new LatLng(loc.getDouble("lat"),
+                                              loc.getDouble("lng"));
                         JSONArray types = placeObject.getJSONArray("types");
                         for(int t=0; t<types.length(); t++){
                             String thisType=types.get(t).toString();

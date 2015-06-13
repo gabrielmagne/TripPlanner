@@ -24,6 +24,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.rey.material.app.Dialog;
@@ -144,6 +145,7 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 JSONObject obj = fromAdapter.getItemJSON(position);
+                hideSoftKeyboard();
                 try {
                     departure = obj.getString("description");
                     fromID = obj.getString("place_id");
@@ -167,6 +169,7 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
                 JSONObject obj = toAdapter.getItemJSON(position);
+                hideSoftKeyboard();
                 try {
                     arrival = obj.getString("description");
                     toID = obj.getString("place_id");
@@ -321,11 +324,13 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
     private void moveDepartureMarker() {
         departureMarker.setPosition(latLngDep);
         departureMarker.setVisible(true);
+        positionViewPort();
     }
 
     private void moveArrivalMarker() {
         arrivalMarker.setPosition(latLngArr);
         arrivalMarker.setVisible(true);
+        positionViewPort();
     }
 
 
@@ -448,5 +453,29 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
                 dialog.dismiss();
             }
         });
+    }
+
+    private void positionViewPort() {
+        if(latLngDep != null && latLngArr == null) {
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLngDep));
+            return;
+        }
+        if(latLngArr != null && latLngDep == null) {
+            mMap.animateCamera(CameraUpdateFactory.newLatLng(latLngArr));
+            return;
+        }
+        double dLat = latLngDep.latitude  + 90;
+        double dLng = latLngDep.longitude + 180;
+        double aLat = latLngArr.latitude  + 90;
+        double aLng = latLngArr.longitude + 180;
+
+        double n = Math.max(dLat, aLat) - 90;
+        double s = Math.min(dLat, aLat) - 90;
+        double e = Math.max(dLng, aLng) - 180;
+        double w = Math.min(dLng, aLng) - 180;
+        LatLng ne = new LatLng(n, e);
+        LatLng sw = new LatLng(s, w);
+
+        mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(new LatLngBounds(sw, ne), 200));
     }
 }
