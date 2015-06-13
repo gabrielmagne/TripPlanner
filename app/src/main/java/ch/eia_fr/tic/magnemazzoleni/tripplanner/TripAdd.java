@@ -24,6 +24,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.Marker;
 import com.rey.material.app.Dialog;
 import com.rey.material.app.SimpleDialog;
