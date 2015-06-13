@@ -15,6 +15,7 @@ public class TripActivity extends AppCompatActivity
         implements TripFragment.OnFragmentInteractionListener,
                      TripAdd.OnFragmentInteractionListener,
                      TripInfo.OnFragmentInteractionListener,
+                     TripMap.OnFragmentInteractionListener,
                      FragmentManager.OnBackStackChangedListener {
 
     private ShareActionProvider mActionProvider;
@@ -24,6 +25,7 @@ public class TripActivity extends AppCompatActivity
     private TripAdd tripAdd;
     private TripInfo tripInfo;
     private TripFragment tripList;
+    private TripMap tripMap;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,7 +55,6 @@ public class TripActivity extends AppCompatActivity
         fragmentManager.beginTransaction()
                 .add(R.id.fragment, tripInfo)
                 .addToBackStack(TripInfo.TAG)
-                //.hide(tripList)
                 .commit();
     }
 
@@ -64,7 +65,6 @@ public class TripActivity extends AppCompatActivity
         fragmentManager.beginTransaction()
                 .add(R.id.fragment, tripAdd)
                 .addToBackStack(TripAdd.TAG)
-                //.hide(tripList)
                 .commit();
     }
 
@@ -85,13 +85,17 @@ public class TripActivity extends AppCompatActivity
         fragmentManager.beginTransaction()
                 .add(R.id.fragment, tripInfo)
                 .addToBackStack(TripInfo.TAG)
-                //.hide(tripAdd)
                 .commit();
     }
 
     @Override
-    public void onInfoOpenMap(Trip trip) {
-        Log.i("Evt Info", trip.getId() + "");
+    public void onInfoOpenMap(Trip trip, Point pos) {
+        tripMap = TripMap.newInstance(trip, pos);
+
+        fragmentManager.beginTransaction()
+                .add(R.id.fragment, tripMap)
+                .addToBackStack(TripMap.TAG)
+                .commit();
     }
 
     @Override

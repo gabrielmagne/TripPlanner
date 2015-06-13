@@ -175,15 +175,15 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             Point size = new Point();
             getActivity().getWindowManager().getDefaultDisplay().getSize(size);
-            int cx = transX;
-            int cy = transY;
-            int finalRadius = Math.max(size.x, size.y);
-            Animator anim = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
+        int cx = transX;
+        int cy = transY;
+        int finalRadius = Math.max(size.x, size.y);
+        Animator anim = ViewAnimationUtils.createCircularReveal(view, cx, cy, 0, finalRadius);
 
-            // make the view visible and start the animation
-            view.setVisibility(View.VISIBLE);
-            anim.start();
-        }
+        // make the view visible and start the animation
+        view.setVisibility(View.VISIBLE);
+        anim.start();
+    }
 
     }
 
@@ -195,24 +195,14 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-    }
-
-    @Override
-    public void setEnterTransition(Object transition) {
-        super.setEnterTransition(transition);
-    }
-
     public void onAddPressed() {
-
-        if(loading) return;
 
         if(fromID == null || toID == null) {
             Toast.makeText(getActivity(), "Please, select 2 locations", Toast.LENGTH_LONG);
             return;
         }
+
+        if(loading) return;
 
         loading = true;
 
@@ -281,16 +271,19 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
         }
     }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-
+    private void hideSoftKeyboard() {
         // hide soft keyboard
         View view = getActivity().getCurrentFocus();
         if (view != null) {
             InputMethodManager inputManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
             inputManager.hideSoftInputFromWindow(view.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
         }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        hideSoftKeyboard();
         mListener = null;
     }
 
@@ -389,6 +382,7 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
         @Override
         public void onSuccess(int statusCode, Header[] headers, JSONObject response) {
             try {
+                // TODO 0 results handling
                 JSONObject values = response.getJSONArray("rows")
                         .getJSONObject(0)
                         .getJSONArray("elements")

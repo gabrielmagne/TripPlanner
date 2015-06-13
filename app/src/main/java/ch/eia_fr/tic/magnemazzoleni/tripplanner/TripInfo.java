@@ -2,6 +2,7 @@ package ch.eia_fr.tic.magnemazzoleni.tripplanner;
 
 import android.animation.Animator;
 import android.app.Activity;
+import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
@@ -18,6 +19,8 @@ import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import com.rey.material.widget.FloatingActionButton;
 
 import ch.eia_fr.tic.magnemazzoleni.tripplanner.sql.Trip;
 
@@ -43,6 +46,7 @@ public class TripInfo extends Fragment {
     private TextView arrival;
     private TextView km;
     private TextView duration;
+    private FloatingActionButton maps;
 
     private int transX, transY;
 
@@ -88,7 +92,7 @@ public class TripInfo extends Fragment {
         if (toolbar != null) {
             toolbar.setTitle(R.string.app_name);
             ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(false);
+
         }
 
         // background
@@ -101,6 +105,7 @@ public class TripInfo extends Fragment {
         arrival = (TextView) view.findViewById(R.id.info_arrival);
         km = (TextView) view.findViewById(R.id.info_km);
         duration = (TextView) view.findViewById(R.id.info_time);
+        maps = (FloatingActionButton) view.findViewById(R.id.info_maps);
 
         // fill with trip
         tripname.setText(trip.getName());
@@ -112,6 +117,14 @@ public class TripInfo extends Fragment {
             km.setText(String.format("%d m", trip.getDistance()));
         duration.setText(timeString(trip.getDuration()));
         toolbar.setBackground(new ColorDrawable(trip.getColor() | 0xff000000));
+        maps.setBackgroundColor(trip.getColor() | 0xff000000);
+
+        maps.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onButtonMapOpen(trip);
+            }
+        });
 
         // Inflate the layout for this fragment
         return view;
@@ -128,10 +141,13 @@ public class TripInfo extends Fragment {
         return String.format(out, h, m);
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
     public void onButtonMapOpen(Trip trip) {
         if (mListener != null) {
-            mListener.onInfoOpenMap(trip);
+            int[] pos = new int[2];
+            int w = maps.getWidth() / 2;
+            maps.getLocationOnScreen(pos);
+            Point ppos = new Point(pos[0] + w, pos[1] + w);
+            mListener.onInfoOpenMap(trip, ppos);
         }
     }
 
@@ -189,7 +205,7 @@ public class TripInfo extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        public void onInfoOpenMap(Trip trip);
+        public void onInfoOpenMap(Trip trip, Point pos);
     }
 
 }
