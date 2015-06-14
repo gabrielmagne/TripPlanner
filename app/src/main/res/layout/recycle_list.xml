@@ -4,25 +4,22 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:id="@+id/recycle_layout"
-    android:background="@android:drawable/picture_frame"
-    android:weightSum="10">
+    android:background="@android:drawable/picture_frame">
 
     <LinearLayout
         android:orientation="horizontal"
-        android:layout_width="wrap_content"
+        android:layout_width="15dp"
         android:layout_height="match_parent"
         android:background="#ff57e554"
-        android:layout_weight=".3"
         android:id="@+id/recycle_color">
 
     </LinearLayout>
 
     <LinearLayout
         android:orientation="vertical"
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="fill_parent"
         android:padding="10dp"
-        android:layout_weight="9.7"
         android:background="?android:attr/selectableItemBackground">
 
         <TextView
@@ -30,7 +27,8 @@
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="#name"
-            android:id="@+id/recycle_name" />
+            android:id="@+id/recycle_name"
+            android:singleLine="true" />
 
         <LinearLayout
             android:orientation="vertical"
