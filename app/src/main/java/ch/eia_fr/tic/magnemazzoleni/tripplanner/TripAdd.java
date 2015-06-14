@@ -123,7 +123,6 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
         if (toolbar != null) {
             toolbar.setTitle(R.string.app_name);
             ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-            ((AppCompatActivity) getActivity()).getSupportActionBar().setDisplayShowHomeEnabled(false);
         }
 
         btnAdd = (FloatingActionButton) view.findViewById(R.id.add_save);
@@ -345,7 +344,7 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        public void onAddTrip(Trip trip, Point point);
+        void onAddTrip(Trip trip, Point point);
     }
 
     // Async task objects
@@ -456,6 +455,8 @@ public class TripAdd extends Fragment implements OnMapReadyCallback {
     }
 
     private void positionViewPort() {
+        if(latLngDep == null && latLngArr == null)
+            return;
         if(latLngDep != null && latLngArr == null) {
             mMap.animateCamera(CameraUpdateFactory.newLatLng(latLngDep));
             return;

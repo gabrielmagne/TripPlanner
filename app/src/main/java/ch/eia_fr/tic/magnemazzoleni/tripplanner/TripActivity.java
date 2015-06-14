@@ -46,10 +46,9 @@ public class TripActivity extends AppCompatActivity
     @Override
     public void openTripInfo(Trip trip, Point point) {
         // open details
-        tripInfo = tripInfo.newInstance(trip, point);
+        tripInfo = TripInfo.newInstance(trip, point);
 
         ColorDrawable c = new ColorDrawable(trip.getColor());
-        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(trip.getColor() | 0xff000000));
 
         // close fragment
         fragmentManager.beginTransaction()
@@ -78,7 +77,6 @@ public class TripActivity extends AppCompatActivity
 
         // action bar
         ColorDrawable c = new ColorDrawable(trip.getColor());
-        //getSupportActionBar().setBackgroundDrawable(new ColorDrawable(trip.getColor() | 0xff000000));
 
         // close fragment
         fragmentManager.popBackStack();
@@ -100,12 +98,11 @@ public class TripActivity extends AppCompatActivity
 
     @Override
     public void onBackStackChanged() {
-        Log.i("BACK", fragmentManager.getBackStackEntryCount() + "");
         if(fragmentManager.getBackStackEntryCount() == 0) {
-            //getSupportActionBar().setDisplayHomeAsUpEnabled(false);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(false);
         }
         else {
-            //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         }
     }
 

@@ -97,7 +97,6 @@ public class TripInfo extends Fragment {
         if (toolbar != null) {
             toolbar.setTitle(R.string.app_name);
             ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
-
         }
 
         // background
@@ -213,7 +212,7 @@ public class TripInfo extends Fragment {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        public void onInfoOpenMap(Trip trip, Point pos, boolean restaurants, boolean bars, boolean places);
+        void onInfoOpenMap(Trip trip, Point pos, boolean restaurants, boolean bars, boolean places);
     }
 
 }

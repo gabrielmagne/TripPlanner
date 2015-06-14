@@ -5,8 +5,7 @@ import android.app.Activity;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
-import android.location.Location;
-import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -20,18 +19,14 @@ import android.view.View;
 import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 
-import com.google.android.gms.appindexing.AndroidAppUri;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
-import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
-import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.loopj.android.http.AsyncHttpClient;
 import com.loopj.android.http.JsonHttpResponseHandler;
@@ -41,9 +36,6 @@ import org.apache.http.Header;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONStringer;
-
-import android.util.Log;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -223,6 +215,20 @@ public class TripMap extends Fragment implements OnMapReadyCallback {
         MarkerOptions arr = new MarkerOptions().position(trip.getArrival()).title(trip.getArrivalAddress()).draggable(false);
         mMap.addMarker(dep);
         mMap.addMarker(arr);
+
+        double dLat = trip.getDeparture().latitude  + 90;
+        double dLng = trip.getDeparture().longitude + 180;
+        double aLat = trip.getArrival().latitude  + 90;
+        double aLng = trip.getArrival().longitude + 180;
+
+        double n = Math.max(dLat, aLat) - 90;
+        double s = Math.min(dLat, aLat) - 90;
+        double e = Math.max(dLng, aLng) - 180;
+        double w = Math.min(dLng, aLng) - 180;
+        LatLng ne = new LatLng(n, e);
+        LatLng sw = new LatLng(s, w);
+
+        mMap.moveCamera(CameraUpdateFactory.newLatLngBounds(new LatLngBounds(sw, ne), 1000, 1000, 100));
     }
 
     @Override
@@ -232,7 +238,7 @@ public class TripMap extends Fragment implements OnMapReadyCallback {
         if (mMap != null) {
             setUpMap();
             // no interests to show
-            if (bar|food|places == true){
+            if (bar|food|places){
                 handleInterests(trip.getDeparture());
                 handleInterests(trip.getArrival());
             }
@@ -274,33 +280,14 @@ public class TripMap extends Fragment implements OnMapReadyCallback {
 
                 mMap.animateCamera(CameraUpdateFactory.newLatLngBounds(bounds, 100));
 
-                JSONArray values = response.getJSONArray("routes")
+                final JSONArray values = response.getJSONArray("routes")
                         .getJSONObject(0)
                         .getJSONArray("legs")
                         .getJSONObject(0)
                         .getJSONArray("steps");
 
-                List<LatLng> locations = new ArrayList<>();
+                new DrawRoad(mMap, values).execute();
 
-                for(int i = 0; i < values.length(); i++) {
-                    locations.addAll(
-                            PolylineUtils.decode(
-                                    values.getJSONObject(i)
-                                          .getJSONObject("polyline")
-                                          .getString("points")
-                            )
-                    );
-                }
-
-                PolylineOptions options = new PolylineOptions();
-
-                options.color(Color.BLUE);
-                options.width(7.5f);
-                options.visible(true);
-
-                options.addAll(locations);
-
-                mMap.addPolyline(options);
             } catch (JSONException e) {
                 sendRetryMessage(RETRY_MESSAGE);
             }
@@ -318,7 +305,7 @@ public class TripMap extends Fragment implements OnMapReadyCallback {
                 JSONArray placesArray = response.getJSONArray("results");
                 places = new MarkerOptions[placesArray.length()];
                 for (int p=0; p<placesArray.length(); p++) {
-                    boolean missingValue=false;
+                    boolean missingValue;
                     LatLng placeLL=null;
                     String placeName="";
                     String vicinity="";
@@ -373,4 +360,45 @@ public class TripMap extends Fragment implements OnMapReadyCallback {
             }
         }
     };
+
+    // Async draw
+    private class DrawRoad extends AsyncTask<Void, Void, Void> {
+        GoogleMap map;
+        JSONArray steps;
+        PolylineOptions options = new PolylineOptions();
+
+        public DrawRoad(GoogleMap map, JSONArray steps) {
+            this.map = map;
+            this.steps = steps;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            mMap.addPolyline(options);
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            List<LatLng> locations = new ArrayList<>();
+            for (int i = 0; i < steps.length(); i++) {
+                try {
+                    locations.addAll(
+                            PolylineUtils.decode(
+                                    steps.getJSONObject(i)
+                                          .getJSONObject("polyline")
+                                          .getString("points")
+                            )
+                    );
+                } catch (JSONException e) { }
+            }
+
+            options.color(Color.BLUE);
+            options.width(7.5f);
+            options.visible(true);
+
+            options.addAll(locations);
+
+            return null;
+        }
+    }
 }
