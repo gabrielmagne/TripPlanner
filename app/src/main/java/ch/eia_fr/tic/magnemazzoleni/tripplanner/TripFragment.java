@@ -3,28 +3,22 @@ package ch.eia_fr.tic.magnemazzoleni.tripplanner;
 import android.app.Activity;
 import android.graphics.Point;
 import android.os.Bundle;
+import android.os.Handler;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.BaseAdapter;
-import android.widget.ListAdapter;
-import android.widget.TextView;
 
 import com.rey.material.widget.FloatingActionButton;
-
-import java.util.List;
+import com.rey.material.widget.SnackBar;
 
 import ch.eia_fr.tic.magnemazzoleni.tripplanner.sql.Trip;
-import ch.eia_fr.tic.magnemazzoleni.tripplanner.sql.TripsSQL;
 
 /**
  * A fragment representing a list of Items.
@@ -78,15 +72,6 @@ public class TripFragment extends Fragment {
             ((AppCompatActivity) getActivity()).setSupportActionBar(toolbar);
         }
 
-        // start recycle view
-        recyclerView = (RecyclerView) view.findViewById(R.id.list_cards);
-        tripAdapter = new TripAdapter(getActivity(), mListener);
-        // setup
-        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
-        recyclerView.setLayoutManager(llm);
-        recyclerView.setAdapter(tripAdapter);
-
         // floating button
         btnAdd = (FloatingActionButton) view.findViewById(R.id.list_add_trip);
 
@@ -101,6 +86,53 @@ public class TripFragment extends Fragment {
                 mListener.showAddFragment(ppos);
             }
         });
+
+        // start recycle view
+        recyclerView = (RecyclerView) view.findViewById(R.id.list_cards);
+        tripAdapter = new TripAdapter(getActivity(), mListener);
+        // setup
+        LinearLayoutManager llm = new LinearLayoutManager(getActivity());
+        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        recyclerView.setLayoutManager(llm);
+        recyclerView.setAdapter(tripAdapter);
+
+        // init swipe to dismiss logic
+        ItemTouchHelper swipeToDismissTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(
+                ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+                // callback for swipe to dismiss, removing item from data and adapter
+                final int id = viewHolder.getAdapterPosition();
+                final Trip deleted = tripAdapter.remove(id);
+                final boolean[] canRemove = {true};
+                Snackbar snackbar = Snackbar.make(getView(), "DONE FOR NOW", Snackbar.LENGTH_LONG)
+                        .setActionTextColor(btnAdd.getBackgroundColor())
+                        .setAction("UNDO", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                canRemove[0] = false;
+                                tripAdapter.add(deleted, id);
+                            }
+                        });
+                snackbar.show();
+
+                // XXX: Hackish
+                new Handler(getActivity().getMainLooper()).postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        if (canRemove[0]) {
+                            tripAdapter.remove(deleted);
+                        }
+                    }
+                }, 3500);
+            }
+        });
+        swipeToDismissTouchHelper.attachToRecyclerView(recyclerView);
 
         return view;
     }

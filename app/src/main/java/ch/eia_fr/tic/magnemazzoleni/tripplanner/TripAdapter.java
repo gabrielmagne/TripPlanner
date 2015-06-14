@@ -23,11 +23,12 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
 
     private List<Trip> tripList;
     private TripFragment.OnFragmentInteractionListener callback;
+    private TripsSQL sql;
 
     public TripAdapter(Context context, TripFragment.OnFragmentInteractionListener callback) {
         this.callback = callback;
 
-        TripsSQL sql = new TripsSQL(context);
+        sql = new TripsSQL(context);
         tripList = sql.getAll();
     }
 
@@ -69,8 +70,23 @@ public class TripAdapter extends RecyclerView.Adapter<TripAdapter.TripViewHolder
     }
 
     public void add(Trip trip) {
-        tripList.add(0, trip);
+        add(trip, 0);
+    }
+
+    public void add(Trip trip, int position) {
+        tripList.add(position, trip);
         this.notifyDataSetChanged();
+    }
+
+    public Trip remove(int position) {
+        Trip del = tripList.get(position);
+        tripList.remove(position);
+        this.notifyDataSetChanged();
+        return del;
+    }
+
+    public void remove(Trip deleted) {
+        sql.delete(deleted);
     }
 
     protected class TripViewHolder extends RecyclerView.ViewHolder {
